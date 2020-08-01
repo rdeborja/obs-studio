@@ -556,7 +556,7 @@ struct obs_output_info ffmpeg_muxer = {
 	.get_properties = ffmpeg_mux_properties,
 };
 
-static int connect_time(struct ffmpeg_mux *stream)
+static int connect_time(struct ffmpeg_muxer *stream)
 {
 	UNUSED_PARAMETER(stream);
 	/* TODO */
@@ -565,7 +565,7 @@ static int connect_time(struct ffmpeg_mux *stream)
 
 static int ffmpeg_mpegts_mux_connect_time(void *data)
 {
-	struct ffmpeg_mux *stream = data;
+	struct ffmpeg_muxer *stream = data;
 	/* TODO */
 	return connect_time(stream);
 }
@@ -862,6 +862,13 @@ static void replay_buffer_save(struct ffmpeg_muxer *stream)
 	if (dstr_end(&stream->path) != '/')
 		dstr_cat_ch(&stream->path, '/');
 	dstr_cat(&stream->path, filename);
+
+	char *slash = strrchr(stream->path.array, '/');
+	if (slash) {
+		*slash = 0;
+		os_mkdirs(stream->path.array);
+		*slash = '/';
+	}
 
 	bfree(filename);
 	obs_data_release(settings);

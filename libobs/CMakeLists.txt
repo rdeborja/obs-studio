@@ -362,6 +362,7 @@ set(libobs_util_SOURCES
 set(libobs_util_HEADERS
 	util/curl/curl-helper.h
 	util/sse-intrin.h
+	util/sse2neon.h
 	util/array-serializer.h
 	util/file-serializer.h
 	util/utf8.h
@@ -476,6 +477,9 @@ if(UNIX AND NOT APPLE)
 	foreach(LIB "obs" "rt")
 		set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
 	endforeach()
+	if(LOWERCASE_CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)64(le)?")
+		set(PPC64_CFLAGS "-DNO_WARN_X86_INTRINSICS -mvsx")
+	endif()
 	CONFIGURE_FILE("libobs.pc.in" "libobs.pc" @ONLY)
 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libobs.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 endif()
